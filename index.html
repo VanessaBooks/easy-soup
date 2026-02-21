@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>煲汤小助手</title>
+  <style>
+    /*
+      配色方案：中国传统文化风
+      ● 中国红   #C41E3A  —— 主色，喜庆吉祥
+      ● 深朱红   #8B0000  —— 按压态
+      ● 金色     #D4AF37  —— 点缀，富贵长寿
+      ● 浅金     #F5E6A3  —— 标签底色
+      ● 宣纸米白 #FEF6E8  —— 页面背景
+      ● 墨黑     #1A1A1A  —— 正文文字
+    */
+
+    /* ===== 全局基础样式 ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+      font-size: 20px;
+      background-color: #FEF6E8;
+      color: #1A1A1A;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* ===== 顶部导航 ===== */
+    .top-bar {
+      background-color: #C41E3A;
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 6px rgba(139,0,0,0.3);
+    }
+
+    .top-bar h1 {
+      font-size: 22px;
+      font-weight: bold;
+      flex: 1;
+    }
+
+    .btn-back {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.6);
+      color: #fff;
+      font-size: 18px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-back:active {
+      background: rgba(255,255,255,0.4);
+    }
+
+    /* ===== 页面容器 ===== */
+    .page {
+      display: none;
+      padding: 20px 16px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ===== 大按钮样式（首页 & 列表按钮）===== */
+    .big-btn {
+      display: block;
+      width: 100%;
+      min-height: 70px;
+      background-color: #C41E3A;
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      padding: 14px 20px;
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.4;
+      box-shadow: 0 3px 6px rgba(139,0,0,0.25);
+    }
+
+    .big-btn:active {
+      background-color: #8B0000;
+    }
+
+    .big-btn .btn-sub {
+      font-size: 16px;
+      font-weight: normal;
+      opacity: 0.85;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ===== 列表按钮（食材/汤名列表）===== */
+    .list-btn {
+      display: block;
+      width: 100%;
+      min-height: 64px;
+      background-color: #fff;
+      color: #1A1A1A;
+      font-size: 21px;
+      border: 2px solid #D4AF37;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .list-btn:active {
+      background-color: #FDF2D0;
+    }
+
+    /* ===== 分类标签按钮 ===== */
+    .category-btn {
+      display: block;
+      width: 100%;
+      min-height: 64px;
+      background-color: #D4AF37;
+      color: #fff;
+      font-size: 21px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 2px 5px rgba(180,140,0,0.3);
+    }
+
+    .category-btn:active {
+      background-color: #A88400;
+    }
+
+    /* ===== 本周推荐 - 星期卡片 ===== */
+    .week-card {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border: 2px solid #D4AF37;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      gap: 14px;
+    }
+
+    .week-card:active {
+      background-color: #FDF2D0;
+    }
+
+    .week-day {
+      background-color: #C41E3A;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 8px 12px;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .week-soup {
+      font-size: 21px;
+      font-weight: bold;
+      color: #1A1A1A;
+    }
+
+    /* ===== 汤详情页 ===== */
+    .detail-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #C41E3A;
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #D4AF37;
+    }
+
+    .detail-section {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid #D4AF37;
+    }
+
+    .detail-section h3 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #C41E3A;
+      margin-bottom: 10px;
+    }
+
+    .detail-section p,
+    .detail-section li {
+      font-size: 19px;
+      line-height: 1.7;
+      color: #1A1A1A;
+    }
+
+    .detail-section ul,
+    .detail-section ol {
+      padding-left: 20px;
+    }
+
+    .detail-section li {
+      margin-bottom: 6px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* 功效标签：金底深金字 */
+    .tag {
+      background-color: #FDF2D0;
+      color: #7A5C00;
+      font-size: 17px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #D4AF37;
+    }
+
+    /* 不适合人群标签：淡红底 */
+    .tag.avoid {
+      background-color: #FDECEA;
+      color: #9B1C1C;
+      border-color: #E8A0A0;
+    }
+
+    /* 替代食材标签：翠绿（玉色）*/
+    .tag.replace {
+      background-color: #E8F5E9;
+      color: #1B5E20;
+      border-color: #81C784;
+    }
+
+    /* ===== 食材功效详情 ===== */
+    .ingr-title {
+      font-size: 26px;
+      font-weight: bold;
+      color: #C41E3A;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ===== 页面标题 ===== */
+    .page-heading {
+      font-size: 24px;
+      font-weight: bold;
+      color: #C41E3A;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #D4AF37;
+    }
+
+    /* ===== 首页欢迎语 ===== */
+    .home-welcome {
+      text-align: center;
+      color: #C41E3A;
+      font-size: 18px;
+      margin-bottom: 24px;
+      padding: 14px 12px;
+      background: #fff;
+      border-radius: 10px;
+      border: 2px solid #D4AF37;
+    }
+
+    .home-welcome strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    /* ===== 步骤样式 ===== */
+    .step-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      background-color: #C41E3A;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text {
+      font-size: 19px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 顶部导航栏（所有页面共享）===== -->
+<div class="top-bar" id="topBar">
+  <h1 id="pageTitle">🍲 煲汤小助手</h1>
+  <button class="btn-back" id="btnBack" onclick="goBack()" style="display:none;">← 返回</button>
+</div>
+
+<!-- ===========================
+     页面 0：首页
+     =========================== -->
+<div class="page active" id="page-home">
+  <div class="home-welcome">
+    今天想喝什么汤？请选择 👇
+  </div>
+
+  <button class="big-btn" onclick="showPage('page-ingredient')">
+    🥕 按食材找汤
+    <span class="btn-sub">选择食材，查找对应汤品</span>
+  </button>
+
+  <button class="big-btn" onclick="showPage('page-category')">
+    📋 按类型找汤
+    <span class="btn-sub">按功效分类浏览汤品</span>
+  </button>
+
+  <button class="big-btn" onclick="showPage('page-weekly')">
+    📅 本周推荐
+    <span class="btn-sub">七天养生汤菜单</span>
+  </button>
+
+  <button class="big-btn" onclick="showPage('page-ingr-list')">
+    🌿 食材功效
+    <span class="btn-sub">了解各食材的营养功效</span>
+  </button>
+</div>
+
+<!-- ===========================
+     页面 1：按食材找汤 - 食材列表
+     =========================== -->
+<div class="page" id="page-ingredient">
+  <div class="page-heading">🥕 请选择主食材</div>
+  <div id="ingredient-list"></div>
+</div>
+
+<!-- ===========================
+     页面 1b：子食材列表（如菌菇类、海鲜类、素菜类的具体选项）
+     =========================== -->
+<div class="page" id="page-subingredient">
+  <div class="page-heading" id="subingredient-title">请选择种类</div>
+  <div id="subingredient-list"></div>
+</div>
+
+<!-- ===========================
+     页面 2：某食材的汤品列表
+     =========================== -->
+<div class="page" id="page-soup-list">
+  <div class="page-heading" id="soup-list-title">汤品列表</div>
+  <div id="soup-list"></div>
+</div>
+
+<!-- ===========================
+     页面 3：按类型找汤 - 分类列表
+     =========================== -->
+<div class="page" id="page-category">
+  <div class="page-heading">📋 请选择汤品类型</div>
+  <div id="category-list"></div>
+</div>
+
+<!-- ===========================
+     页面 4：本周推荐
+     =========================== -->
+<div class="page" id="page-weekly">
+  <div class="page-heading">📅 本周煲汤推荐</div>
+  <div id="weekly-list"></div>
+  <button class="big-btn" onclick="regenerateWeekly()" style="margin-top:8px;">
+    🎲 重新生成本周菜单
+    <span class="btn-sub">随机为您搭配七天养生汤</span>
+  </button>
+</div>
+
+<!-- ===========================
+     页面 5：汤品详情
+     =========================== -->
+<div class="page" id="page-soup-detail">
+  <div class="detail-title" id="detail-soup-name"></div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- ===========================
+     页面 6：食材功效 - 分类列表
+     =========================== -->
+<div class="page" id="page-ingr-list">
+  <div class="page-heading">🌿 请选择食材分类</div>
+  <div id="ingr-list"></div>
+</div>
+
+<!-- ===========================
+     页面 6b：食材功效 - 某分类下的食材列表
+     =========================== -->
+<div class="page" id="page-ingr-sublist">
+  <div class="page-heading" id="ingr-sublist-title">请选择食材</div>
+  <div id="ingr-sublist"></div>
+</div>
+
+<!-- ===========================
+     页面 7：食材功效详情
+     =========================== -->
+<div class="page" id="page-ingr-detail">
+  <div class="ingr-title" id="ingr-detail-name"></div>
+  <div id="ingr-detail-content"></div>
+</div>
+
+
+<script>
+  /* ============================================================
+     数据区：汤品数据（soups）
+     每个汤包含：名称、主食材、分类、配料、步骤、功效、适合人群、不适合人群、可替代食材
+  ============================================================ */
+  const soups = [
+    {
+      name: "山药排骨汤",
+      mainIngredient: "排骨",
+      category: ["清淡养胃", "健脾开胃", "滋补强身"],
+      mainMaterial: "排骨 500g、山药 300g",
+      ingredients: ["枸杞 10粒", "生姜 3片", "盐 适量", "料酒 1汤匙"],
+      steps: [
+        "排骨洗净，冷水下锅焯水2分钟，捞出备用。",
+        "山药去皮切块，泡入清水中防止氧化。",
+        "锅中加入清水，放入排骨、姜片和料酒，大火煮开。",
+        "转小火，加入山药，继续炖煮40分钟。",
+        "出锅前加盐调味，撒入枸杞即可。"
+      ],
+      benefits: ["健脾养胃", "补钙强骨", "滋阴润燥", "帮助消化"],
+      suitableFor: ["脾胃虚弱者", "骨质疏松人群", "老年人", "术后恢复期"],
+      avoidFor: ["痛风患者", "高嘌呤饮食人群", "肾病患者（请遵医嘱）"],
+      replacements: { "山药": ["莲藕", "白萝卜", "土豆"] }
+    },
+    {
+      name: "莲藕排骨汤",
+      mainIngredient: "排骨",
+      category: ["清淡养胃", "补气养血", "健脾开胃"],
+      mainMaterial: "排骨 500g、莲藕 400g",
+      ingredients: ["生姜 4片", "红枣 5颗", "盐 适量", "料酒 1汤匙"],
+      steps: [
+        "排骨焯水，去血水杂质，捞出备用。",
+        "莲藕刮皮切厚片，红枣洗净去核。",
+        "汤锅中加足量清水，放入排骨、姜片和料酒，大火烧开。",
+        "放入莲藕和红枣，转小火慢炖50分钟。",
+        "加盐调味，出锅享用。"
+      ],
+      benefits: ["补气养血", "健脾开胃", "清热凉血", "补铁补血"],
+      suitableFor: ["气血不足者", "贫血人群", "食欲不振者", "女性调理"],
+      avoidFor: ["脾胃虚寒腹泻者（莲藕性凉）", "痛风急性期患者"],
+      replacements: { "莲藕": ["山药", "玉米", "冬瓜"] }
+    },
+    {
+      name: "玉米胡萝卜排骨汤",
+      mainIngredient: "排骨",
+      category: ["清淡养胃", "增强免疫", "健脾开胃"],
+      mainMaterial: "排骨 500g、玉米 2根、胡萝卜 2根",
+      ingredients: ["生姜 3片", "盐 适量", "料酒 1汤匙"],
+      steps: [
+        "排骨冷水下锅焯水，撇去浮沫，捞出备用。",
+        "玉米切段，胡萝卜切滚刀块。",
+        "将排骨、姜片和料酒放入汤锅，加清水大火煮开。",
+        "加入玉米和胡萝卜，转小火炖40分钟。",
+        "加盐调味即可出锅。"
+      ],
+      benefits: ["增强免疫力", "明目养肝", "补钙强身", "健脾利湿"],
+      suitableFor: ["儿童及老人", "免疫力低下者", "眼睛干涩者", "日常保健"],
+      avoidFor: ["血糖偏高者（玉米含糖）请适量", "糖尿病患者请咨询医生"],
+      replacements: { "胡萝卜": ["南瓜", "番茄"], "玉米": ["莲藕", "山药"] }
+    },
+    {
+      name: "菌菇排骨汤",
+      mainIngredient: "排骨",
+      category: ["增强免疫", "补气养血", "滋补强身"],
+      mainMaterial: "排骨 500g、香菇 6朵、金针菇 100g",
+      ingredients: ["蟹味菇 100g", "生姜 3片", "盐 适量", "料酒 1汤匙", "枸杞少许"],
+      steps: [
+        "排骨焯水备用，各类菌菇洗净撕小块。",
+        "汤锅中放入排骨、姜片和料酒，加水大火烧开。",
+        "撇去浮沫，转小火炖30分钟。",
+        "加入各类菌菇，继续炖20分钟。",
+        "加盐调味，加入枸杞，出锅。"
+      ],
+      benefits: ["增强免疫力", "抗疲劳", "补气益血", "防癌抗老"],
+      suitableFor: ["免疫力低下者", "亚健康人群", "老年人日常保健", "化疗后调理"],
+      avoidFor: ["菌菇过敏者", "痛风急性期（嘌呤较高）"],
+      replacements: { "香菇": ["羊肚菌", "平菇", "茶树菇"], "金针菇": ["秀珍菇"] }
+    },
+    {
+      name: "山药鸡汤",
+      mainIngredient: "鸡肉",
+      category: ["清淡养胃", "补气养血", "增强免疫"],
+      mainMaterial: "土鸡半只（约600g）、山药 300g",
+      ingredients: ["枸杞 15粒", "红枣 6颗", "生姜 4片", "盐 适量"],
+      steps: [
+        "鸡肉洗净斩块，冷水下锅焯水，去除血污。",
+        "山药去皮切块，红枣去核备用。",
+        "鸡肉放入汤锅，加足量清水和姜片，大火烧开。",
+        "转小火，加入山药和红枣，炖煮50分钟。",
+        "起锅前加枸杞和盐，调味即可。"
+      ],
+      benefits: ["大补元气", "健脾养胃", "滋阴润燥", "增强体力"],
+      suitableFor: ["体质虚弱者", "产后调理", "老年人补气", "病后恢复"],
+      avoidFor: ["感冒发烧期间不宜", "实热体质者适量"],
+      replacements: { "山药": ["莲藕", "百合", "玉米"], "鸡肉": ["排骨", "乌鸡"] }
+    },
+    {
+      name: "玉米胡萝卜骨头汤",
+      mainIngredient: "猪骨",
+      category: ["清淡养胃", "健脾开胃", "滋补强身"],
+      mainMaterial: "猪骨 600g、玉米 2根、胡萝卜 2根",
+      ingredients: ["生姜 4片", "料酒 1汤匙", "盐 适量", "枸杞少许"],
+      steps: [
+        "猪骨冷水下锅，大火焯水5分钟，撇去浮沫，捞出冲洗干净。",
+        "玉米切段，胡萝卜切大块。",
+        "汤锅中加入足量清水，放入猪骨、姜片和料酒，大火烧开。",
+        "转小火，加入玉米和胡萝卜，慢炖1小时。",
+        "加枸杞和盐调味，即可出锅。"
+      ],
+      benefits: ["补钙强骨", "明目养肝", "健脾开胃", "促进生长发育"],
+      suitableFor: ["老年人补钙", "骨质疏松人群", "儿童成长", "日常养生"],
+      avoidFor: ["痛风急性期", "高嘌呤饮食限制者", "肾功能不全者请遵医嘱"],
+      replacements: { "猪骨": ["排骨"], "胡萝卜": ["南瓜", "莲藕"] }
+    },
+    {
+      name: "冬瓜海带汤",
+      mainIngredient: "冬瓜",
+      category: ["清淡养胃", "清热消暑"],
+      mainMaterial: "冬瓜 400g、海带 100g（泡发后）",
+      ingredients: ["虾皮 20g", "生姜 2片", "葱花少许", "盐 适量", "香油少许"],
+      steps: [
+        "海带提前泡发，洗净切宽条；冬瓜去皮切块。",
+        "锅中加清水，放入姜片和虾皮，大火烧开。",
+        "加入海带，煮10分钟。",
+        "加入冬瓜，继续煮8-10分钟至冬瓜透明变软。",
+        "加盐调味，淋香油，撒葱花出锅。"
+      ],
+      benefits: ["清热利水", "消肿减脂", "补碘护甲状腺", "降血压辅助"],
+      suitableFor: ["水肿人群", "需要减重者", "高血压辅助调理", "夏日清热"],
+      avoidFor: ["甲状腺功能亢进者（海带碘高）", "脾胃虚寒腹泻者"],
+      replacements: { "冬瓜": ["丝瓜", "黄瓜"], "海带": ["紫菜", "裙带菜"] }
+    },
+    {
+      name: "羊肚菌鸡汤",
+      mainIngredient: "羊肚菌",
+      category: ["增强免疫", "补气养血"],
+      mainMaterial: "土鸡半只（约600g）、羊肚菌 15g（干）",
+      ingredients: ["枸杞 10粒", "红枣 5颗", "生姜 4片", "盐 适量"],
+      steps: [
+        "羊肚菌提前用温水泡发30分钟，洗净备用（泡发水可留用）。",
+        "鸡肉斩块焯水，去除血污。",
+        "汤锅中放入鸡肉、姜片，加清水大火烧开。",
+        "加入羊肚菌（及泡发水）、红枣，转小火炖1小时。",
+        "起锅前加枸杞和盐调味即可。"
+      ],
+      benefits: ["大补元气", "增强免疫力", "健脾益胃"],
+      suitableFor: ["体虚气弱者", "免疫力低下者", "老年人日常保健"],
+      avoidFor: ["菌菇过敏者", "对羊肚菌不耐受者请少量尝试"],
+      replacements: { "羊肚菌": ["香菇", "茶树菇", "猴头菇"] }
+    },
+    {
+      name: "干贝冬瓜汤",
+      mainIngredient: "干贝",
+      category: ["清淡养胃", "清热消暑", "滋补强身"],
+      mainMaterial: "干贝 30g、冬瓜 400g",
+      ingredients: ["生姜 2片", "葱白 2段", "盐 适量", "香油几滴"],
+      steps: [
+        "干贝提前用清水泡发1小时，保留泡发水。",
+        "冬瓜去皮去籽，切厚片。",
+        "锅中加清水和泡发水，放入姜片和葱白，大火烧开。",
+        "加入干贝，中小火煮15分钟。",
+        "加入冬瓜，继续煮10分钟至熟，加盐调味，淋香油出锅。"
+      ],
+      benefits: ["滋阴补肾", "清热利水", "健脾和胃", "补充矿物质"],
+      suitableFor: ["肾虚腰酸者", "水肿人群", "夏日清热", "消化不良者"],
+      avoidFor: ["海鲜过敏者", "痛风患者（干贝嘌呤较高）", "甲亢患者"],
+      replacements: { "干贝": ["虾皮", "海米"], "冬瓜": ["丝瓜", "节瓜"] }
+    },
+    // ---- 菌菇类新汤 ----
+    {
+      name: "香菇鸡汤",
+      mainIngredient: "香菇",
+      category: ["清淡养胃", "补气养血", "增强免疫"],
+      mainMaterial: "土鸡半只（约600g）、香菇 8朵",
+      ingredients: ["红枣 5颗", "枸杞 10粒", "生姜 4片", "盐 适量"],
+      steps: [
+        "鸡肉洗净斩块，冷水下锅焯水，去除血污，捞出备用。",
+        "香菇提前泡发（干香菇），洗净切去根部；鲜香菇直接洗净备用。",
+        "汤锅加清水，放入鸡肉和姜片，大火烧开后撇去浮沫。",
+        "转小火，加入香菇和红枣，慢炖50分钟。",
+        "起锅前放入枸杞和盐，调味即可。"
+      ],
+      benefits: ["增强免疫力", "补气养血", "健脾益胃", "延缓衰老"],
+      suitableFor: ["免疫力低下者", "脾胃虚弱者", "老年人日常保健", "病后恢复"],
+      avoidFor: ["菌菇过敏者", "痛风急性期适量"],
+      replacements: { "香菇": ["羊肚菌", "平菇", "茶树菇"] }
+    },
+    {
+      name: "白玉菇豆腐汤",
+      mainIngredient: "白玉菇",
+      category: ["清淡养胃", "增强免疫", "清热消暑"],
+      mainMaterial: "白玉菇 200g、嫩豆腐 1块",
+      ingredients: ["虾皮 15g（可选）", "生姜 2片", "葱花少许", "盐 适量", "香油几滴"],
+      steps: [
+        "白玉菇洗净去根，撕小朵；豆腐切成小块备用。",
+        "锅中加清水，放入姜片和虾皮，大火烧开。",
+        "加入白玉菇，中火煮5分钟。",
+        "放入豆腐块，轻轻推开，继续煮3分钟。",
+        "加盐调味，淋香油，撒葱花出锅。"
+      ],
+      benefits: ["清淡养胃", "补充植物蛋白", "低脂低卡", "增强免疫"],
+      suitableFor: ["素食者", "肠胃不适者", "需要减重者", "老年人清补"],
+      avoidFor: ["菌菇过敏者", "嘌呤敏感者适量"],
+      replacements: { "白玉菇": ["蟹味菇", "金针菇", "平菇"], "豆腐": ["嫩豆腐、老豆腐均可"] }
+    },
+    {
+      name: "蟹味菇鸡汤",
+      mainIngredient: "蟹味菇",
+      category: ["增强免疫", "补气养血", "滋补强身"],
+      mainMaterial: "鸡腿 2个（约400g）、蟹味菇 200g",
+      ingredients: ["红枣 4颗", "生姜 3片", "料酒 1汤匙", "盐 适量"],
+      steps: [
+        "鸡腿洗净斩块，焯水后捞出备用。",
+        "蟹味菇洗净，切去根部，撕成小朵。",
+        "锅中加清水，放入鸡腿、姜片和料酒，大火烧开。",
+        "加入蟹味菇和红枣，转小火炖40分钟。",
+        "加盐调味即可出锅。"
+      ],
+      benefits: ["增强免疫力", "补气健脾", "抗疲劳", "养血安神"],
+      suitableFor: ["体虚易疲劳者", "免疫力低下者", "老年人保健", "亚健康人群"],
+      avoidFor: ["菌菇过敏者", "痛风患者适量"],
+      replacements: { "蟹味菇": ["白玉菇", "秀珍菇", "金针菇"] }
+    },
+    // ---- 海鲜类新汤 ----
+    {
+      name: "鲜虾冬瓜汤",
+      mainIngredient: "鲜虾",
+      category: ["清淡养胃", "清热消暑", "健脾开胃"],
+      mainMaterial: "鲜虾 300g、冬瓜 400g",
+      ingredients: ["生姜 3片", "葱花少许", "盐 适量", "香油几滴"],
+      steps: [
+        "鲜虾洗净，剪去虾须，挑去虾线备用。",
+        "冬瓜去皮切块。",
+        "锅中加清水，放入姜片，大火烧开。",
+        "加入冬瓜，煮8分钟至半透明。",
+        "加入鲜虾，大火煮3-4分钟至虾变红，加盐调味，淋香油，撒葱花出锅。"
+      ],
+      benefits: ["清热利水", "补钙补锌", "消肿减脂", "健脾开胃"],
+      suitableFor: ["水肿人群", "食欲不振者", "老年人清补", "夏日清热"],
+      avoidFor: ["海鲜过敏者", "痛风患者", "虾与维生素C同服者慎食"],
+      replacements: { "鲜虾": ["虾仁", "基围虾"], "冬瓜": ["丝瓜", "节瓜"] }
+    },
+    {
+      name: "鲍鱼瘦肉汤",
+      mainIngredient: "鲍鱼",
+      category: ["补气养血", "滋补强身"],
+      mainMaterial: "小鲍鱼 6个、猪瘦肉 200g",
+      ingredients: ["枸杞 10粒", "红枣 4颗", "生姜 3片", "盐 适量"],
+      steps: [
+        "鲍鱼用刷子刷洗干净，在表面划十字花刀；猪瘦肉切块焯水备用。",
+        "汤锅中加足量清水，放入瘦肉和姜片，大火烧开后撇去浮沫。",
+        "转小火炖30分钟。",
+        "加入鲍鱼和红枣，继续炖30分钟。",
+        "起锅前加入枸杞和盐，调味即可。"
+      ],
+      benefits: ["滋阴补肾", "明目养肝", "补气养血", "滋补强身"],
+      suitableFor: ["肾虚腰酸者", "视力下降者", "气血不足者", "老年人滋补"],
+      avoidFor: ["海鲜过敏者", "痛风患者（嘌呤较高）", "感冒发烧期间"],
+      replacements: { "鲍鱼": ["干贝", "扇贝肉"], "猪瘦肉": ["排骨", "鸡肉"] }
+    },
+    // ---- 素菜类新汤 ----
+    {
+      name: "丝瓜豆腐汤",
+      mainIngredient: "丝瓜",
+      category: ["清淡养胃", "清热消暑"],
+      mainMaterial: "丝瓜 2根（约300g）、嫩豆腐 1块",
+      ingredients: ["虾皮 15g（可选）", "生姜 2片", "葱花少许", "盐 适量", "香油少许"],
+      steps: [
+        "丝瓜去皮切滚刀块；豆腐切成厚片备用。",
+        "锅中加清水，放入姜片和虾皮，大火烧开。",
+        "加入豆腐，中火煮5分钟。",
+        "加入丝瓜，继续煮5分钟至丝瓜变软。",
+        "加盐调味，淋香油，撒葱花即可。"
+      ],
+      benefits: ["清热解暑", "润肤美容", "通乳利水", "健脾养胃"],
+      suitableFor: ["夏日清热", "皮肤干燥者", "哺乳期女性", "素食老人"],
+      avoidFor: ["脾胃虚寒腹泻者（丝瓜性凉）", "体质虚寒者少食"],
+      replacements: { "丝瓜": ["冬瓜", "黄瓜"], "豆腐": ["嫩豆腐口感更嫩滑"] }
+    },
+    {
+      name: "白萝卜清汤",
+      mainIngredient: "白萝卜",
+      category: ["清淡养胃", "健脾开胃"],
+      mainMaterial: "白萝卜 500g",
+      ingredients: ["生姜 3片", "葱花少许", "盐 适量", "香油几滴", "枸杞少许"],
+      steps: [
+        "白萝卜洗净去皮，切成大块或厚片。",
+        "锅中加清水，放入姜片，大火烧开。",
+        "加入白萝卜，转中小火煮25分钟至软透。",
+        "加盐调味，淋香油。",
+        "撒葱花和枸杞，出锅即可。"
+      ],
+      benefits: ["消食化气", "清热润燥", "止咳化痰", "助消化"],
+      suitableFor: ["消化不良者", "腹胀气滞者", "咳嗽痰多者", "老年人日常"],
+      avoidFor: ["脾胃虚寒者少食", "服用补药期间不宜（萝卜解药）"],
+      replacements: { "白萝卜": ["胡萝卜", "冬瓜"] }
+    },
+    {
+      name: "南瓜玉米汤",
+      mainIngredient: "南瓜",
+      category: ["清淡养胃", "健脾开胃"],
+      mainMaterial: "南瓜 300g、玉米 1根",
+      ingredients: ["生姜 2片", "盐 适量", "枸杞少许"],
+      steps: [
+        "南瓜去皮去籽，切大块；玉米切段。",
+        "锅中加清水，放入姜片和玉米，大火烧开。",
+        "加入南瓜，转中小火煮20分钟。",
+        "汤色变黄、南瓜软烂后，加盐调味。",
+        "放入枸杞，出锅即可。"
+      ],
+      benefits: ["健脾养胃", "明目护肝", "润肠通便", "补充维生素"],
+      suitableFor: ["脾胃虚弱者", "便秘者", "老年人", "眼睛干涩者"],
+      avoidFor: ["血糖偏高者适量（南瓜升糖较快）", "糖尿病患者请咨询医生"],
+      replacements: { "南瓜": ["红薯", "玉米"], "玉米": ["山药", "莲藕"] }
+    }
+  ];
+
+  /* ============================================================
+     数据区：食材功效数据（ingredientsInfo）
+  ============================================================ */
+  const ingredientsInfo = [
+    {
+      name: "山药",
+      benefits: ["健脾益胃", "滋阴润燥", "补肺益肾", "助消化"],
+      suitableFor: ["脾胃虚弱者", "糖尿病辅助（升糖慢）", "老年人", "体虚者"],
+      avoidFor: ["大便燥结者不宜多食", "湿热体质适量"],
+      pairWith: ["排骨", "鸡肉", "枸杞", "红枣"]
+    },
+    {
+      name: "排骨",
+      benefits: ["补钙强骨", "补充蛋白质", "滋阴养血", "益精补髓"],
+      suitableFor: ["骨质疏松人群", "生长发育期儿童", "老年人", "术后恢复"],
+      avoidFor: ["痛风患者", "高血脂人群适量", "肾病患者请遵医嘱"],
+      pairWith: ["山药", "莲藕", "玉米", "菌菇", "海带"]
+    },
+    {
+      name: "鸡肉",
+      benefits: ["大补元气", "温中益气", "补精填髓", "益五脏"],
+      suitableFor: ["体质虚弱者", "产后调理", "老年人", "病后恢复"],
+      avoidFor: ["感冒发烧期间不宜", "实热体质者适量", "痛风患者适量"],
+      pairWith: ["山药", "羊肚菌", "枸杞", "红枣"]
+    },
+    {
+      name: "羊肚菌",
+      benefits: ["大补元气", "增强免疫力", "健脾益胃"],
+      suitableFor: ["免疫力低下者", "体虚气弱者", "老年人保健"],
+      avoidFor: ["菌菇过敏者", "第一次食用建议少量尝试"],
+      pairWith: ["鸡肉", "排骨", "枸杞", "红枣"]
+    },
+    {
+      name: "干贝",
+      benefits: ["滋阴补肾", "养肝明目", "和胃补中", "富含锌和硒"],
+      suitableFor: ["肾虚腰酸者", "眼睛疲劳者", "消化不良者", "老年保健"],
+      avoidFor: ["海鲜过敏者", "痛风患者（嘌呤较高）", "甲亢患者"],
+      pairWith: ["冬瓜", "丝瓜", "豆腐", "萝卜"]
+    },
+    {
+      name: "冬瓜",
+      benefits: ["清热利水", "消肿减脂", "生津止渴", "祛湿消暑"],
+      suitableFor: ["水肿人群", "需减重者", "高血压辅助调理", "夏日清热"],
+      avoidFor: ["脾胃虚寒腹泻者", "虚寒体质者少食"],
+      pairWith: ["海带", "干贝", "排骨", "虾"]
+    },
+    {
+      name: "莲藕",
+      benefits: ["补气养血", "清热凉血", "健脾开胃", "止泻固精"],
+      suitableFor: ["气血不足者", "贫血人群", "食欲不振者", "便秘者"],
+      avoidFor: ["脾胃虚寒腹泻者（性凉）", "产妇产后早期慎食"],
+      pairWith: ["排骨", "红枣", "猪肉", "糯米"]
+    },
+    {
+      name: "枸杞",
+      benefits: ["养肝明目", "补肾益精", "延缓衰老", "增强免疫"],
+      suitableFor: ["肝肾不足者", "视力下降者", "老年人保健", "腰膝酸软者"],
+      avoidFor: ["感冒发烧期间不宜", "脾虚湿热腹泻者", "阴虚火旺者少食"],
+      pairWith: ["鸡肉", "山药", "红枣", "菊花"]
+    },
+    // ---- 肉类新增 ----
+    {
+      name: "猪骨",
+      benefits: ["补钙强骨", "益精补髓", "强健筋骨", "补充胶原蛋白"],
+      suitableFor: ["骨质疏松人群", "老年人补钙", "儿童成长", "术后恢复"],
+      avoidFor: ["痛风急性期", "高嘌呤饮食限制者", "肾功能不全者请遵医嘱"],
+      pairWith: ["玉米", "胡萝卜", "山药", "白萝卜"]
+    },
+    // ---- 菌菇类新增 ----
+    {
+      name: "香菇",
+      benefits: ["增强免疫力", "健脾开胃", "补气养血", "延缓衰老"],
+      suitableFor: ["免疫力低下者", "脾胃虚弱者", "老年人日常保健", "病后恢复"],
+      avoidFor: ["菌菇过敏者", "痛风患者适量（嘌呤较高）"],
+      pairWith: ["鸡肉", "排骨", "豆腐", "枸杞"]
+    },
+    {
+      name: "白玉菇",
+      benefits: ["清淡养胃", "增强免疫", "补充植物蛋白", "低脂低卡"],
+      suitableFor: ["素食者", "需要减重者", "肠胃不适者", "老年人清补"],
+      avoidFor: ["菌菇过敏者", "嘌呤敏感者适量"],
+      pairWith: ["豆腐", "冬瓜", "鸡肉", "丝瓜"]
+    },
+    {
+      name: "蟹味菇",
+      benefits: ["增强免疫力", "抗疲劳", "养血安神", "健脾益气"],
+      suitableFor: ["免疫力低下者", "亚健康人群", "老年人", "体虚易疲劳者"],
+      avoidFor: ["菌菇过敏者", "痛风患者适量"],
+      pairWith: ["鸡肉", "排骨", "豆腐", "白玉菇"]
+    },
+    // ---- 海鲜类新增 ----
+    {
+      name: "鲜虾",
+      benefits: ["补钙补锌", "健脾开胃", "益气补虚", "富含优质蛋白"],
+      suitableFor: ["体质虚弱者", "老年人补钙", "食欲不振者", "儿童发育"],
+      avoidFor: ["海鲜过敏者", "痛风患者", "甲亢患者"],
+      pairWith: ["冬瓜", "丝瓜", "豆腐", "姜"]
+    },
+    {
+      name: "鲍鱼",
+      benefits: ["滋阴补肾", "明目养肝", "补气养血", "滋补强身"],
+      suitableFor: ["肾虚腰酸者", "视力下降者", "气血不足者", "老年人滋补"],
+      avoidFor: ["海鲜过敏者", "痛风患者（嘌呤较高）", "感冒发烧期间不宜"],
+      pairWith: ["瘦肉", "排骨", "枸杞", "红枣"]
+    },
+    {
+      name: "海带",
+      benefits: ["补碘护甲状腺", "清热利水", "降血压辅助", "消肿散结"],
+      suitableFor: ["甲状腺功能偏低者", "高血压辅助调理", "水肿人群", "夏日清热"],
+      avoidFor: ["甲状腺功能亢进者（碘含量高）", "脾胃虚寒腹泻者"],
+      pairWith: ["冬瓜", "排骨", "豆腐", "虾皮"]
+    },
+    // ---- 蔬菜类新增 ----
+    {
+      name: "丝瓜",
+      benefits: ["清热解暑", "润肤美容", "通乳利水", "健脾养胃"],
+      suitableFor: ["夏日清热", "皮肤干燥者", "素食老人", "哺乳期女性"],
+      avoidFor: ["脾胃虚寒腹泻者（性凉）", "体质虚寒者少食"],
+      pairWith: ["豆腐", "鲜虾", "冬瓜", "干贝"]
+    },
+    {
+      name: "白萝卜",
+      benefits: ["消食化气", "清热润燥", "止咳化痰", "助消化"],
+      suitableFor: ["消化不良者", "腹胀气滞者", "咳嗽痰多者", "老年人日常"],
+      avoidFor: ["脾胃虚寒者少食", "服用补药期间不宜（萝卜解药性）"],
+      pairWith: ["排骨", "猪骨", "冬瓜", "姜"]
+    },
+    {
+      name: "南瓜",
+      benefits: ["健脾养胃", "明目护肝", "润肠通便", "补充维生素"],
+      suitableFor: ["脾胃虚弱者", "便秘者", "眼睛干涩者", "老年人"],
+      avoidFor: ["血糖偏高者适量（升糖较快）", "糖尿病患者请咨询医生"],
+      pairWith: ["玉米", "山药", "排骨", "枸杞"]
+    },
+    {
+      name: "玉米",
+      benefits: ["健脾利湿", "明目养肝", "通便排毒", "补充膳食纤维"],
+      suitableFor: ["消化不良者", "便秘者", "眼睛干涩者", "日常保健"],
+      avoidFor: ["血糖偏高者适量（含糖）", "糖尿病患者请咨询医生"],
+      pairWith: ["排骨", "猪骨", "胡萝卜", "南瓜"]
+    },
+    {
+      name: "胡萝卜",
+      benefits: ["明目养肝", "增强免疫力", "补充维生素A", "抗氧化"],
+      suitableFor: ["视力下降者", "免疫力低下者", "老年人", "儿童成长"],
+      avoidFor: ["大量生食不利胡萝卜素吸收（建议烹饪后食用）"],
+      pairWith: ["排骨", "猪骨", "玉米", "鸡肉"]
+    }
+  ];
+
+  /* ============================================================
+     数据区：食材功效分组（ingredientCategoryGroups）
+  ============================================================ */
+  const ingredientCategoryGroups = [
+    { group: "肉类",   icon: "🥩", items: ["排骨", "鸡肉", "猪骨"] },
+    { group: "海鲜类", icon: "🦐", items: ["干贝", "鲜虾", "鲍鱼", "海带"] },
+    { group: "菌菇类", icon: "🍄", items: ["羊肚菌", "香菇", "白玉菇", "蟹味菇"] },
+    { group: "蔬菜类", icon: "🥦", items: ["山药", "冬瓜", "莲藕", "丝瓜", "白萝卜", "南瓜", "玉米", "胡萝卜", "枸杞"] }
+  ];
+
+  /* ============================================================
+     本周推荐菜单（固定7天）
+  ============================================================ */
+  const weeklyMenu = [
+    { day: "周一", soupName: "山药鸡汤" },
+    { day: "周二", soupName: "干贝冬瓜汤" },
+    { day: "周三", soupName: "菌菇排骨汤" },
+    { day: "周四", soupName: "冬瓜海带汤" },
+    { day: "周五", soupName: "羊肚菌鸡汤" },
+    { day: "周六", soupName: "莲藕排骨汤" },
+    { day: "周日", soupName: "玉米胡萝卜骨头汤" }
+  ];
+
+  /* ============================================================
+     数据区：食材分组（ingredientGroups）
+     items 为 null 表示直接跳汤品列表；有数组则显示子食材列表
+  ============================================================ */
+  const ingredientGroups = [
+    { group: "排骨", icon: "🥩", items: null },
+    { group: "鸡肉", icon: "🍗", items: null },
+    { group: "猪骨", icon: "🦴", items: null },
+    { group: "菌菇", icon: "🍄", items: ["羊肚菌", "香菇", "白玉菇", "蟹味菇"] },
+    { group: "海鲜", icon: "🦐", items: ["干贝", "鲜虾", "鲍鱼"] },
+    { group: "素菜", icon: "🥦", items: ["冬瓜", "丝瓜", "白萝卜", "南瓜"] }
+  ];
+
+  /* ============================================================
+     导航历史：用于"返回"功能
+  ============================================================ */
+  let pageHistory = [];
+
+  /* ============================================================
+     showPage()：核心页面切换函数
+     pageId: 目标页面的 ID
+     title: 顶部标题文字
+     record: 是否记录进历史（默认 true）
+  ============================================================ */
+  function showPage(pageId, title, record = true) {
+    // 隐藏当前显示的页面
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    // 显示目标页面
+    document.getElementById(pageId).classList.add('active');
+
+    // 更新顶部标题
+    const titles = {
+      'page-home': '🍲 煲汤小助手',
+      'page-ingredient': '按食材找汤',
+      'page-subingredient': title || '请选择种类',
+      'page-soup-list': title || '汤品列表',
+      'page-category': '按类型找汤',
+      'page-weekly': '本周推荐',
+      'page-soup-detail': title || '汤品详情',
+      'page-ingr-list': '食材功效',
+      'page-ingr-sublist': title || '请选择食材',
+      'page-ingr-detail': title || '食材详情'
+    };
+    document.getElementById('pageTitle').textContent = titles[pageId] || title || '煲汤小助手';
+
+    // 首页隐藏返回按钮，其他页面显示
+    document.getElementById('btnBack').style.display = (pageId === 'page-home') ? 'none' : 'block';
+
+    // 记录页面历史
+    if (record) {
+      pageHistory.push(pageId);
+    }
+  }
+
+  /* ============================================================
+     goBack()：返回上一页
+  ============================================================ */
+  function goBack() {
+    if (pageHistory.length > 1) {
+      pageHistory.pop(); // 移除当前页
+      const prevPage = pageHistory[pageHistory.length - 1];
+      pageHistory.pop(); // 移除上一页（showPage 会重新添加）
+      showPage(prevPage);
+    } else {
+      // 退回首页
+      pageHistory = [];
+      showPage('page-home');
+    }
+  }
+
+  /* ============================================================
+     渲染食材列表（功能1）——使用 ingredientGroups 分组数据
+     有子分类的显示 › 箭头，点击后进入子食材选择页
+     无子分类的直接进入汤品列表
+  ============================================================ */
+  function renderIngredientList() {
+    const container = document.getElementById('ingredient-list');
+    container.innerHTML = '';
+    ingredientGroups.forEach(g => {
+      const btn = document.createElement('button');
+      btn.className = 'list-btn';
+      if (g.items) {
+        btn.textContent = g.icon + ' ' + g.group + '  ›';
+        btn.onclick = () => showSubIngredients(g.group, g.items, g.icon);
+      } else {
+        btn.textContent = g.icon + ' ' + g.group;
+        btn.onclick = () => showSoupsByIngredient(g.group);
+      }
+      container.appendChild(btn);
+    });
+  }
+
+  /* ============================================================
+     显示子食材列表（菌菇、海鲜、素菜等）
+  ============================================================ */
+  function showSubIngredients(groupName, items, icon) {
+    document.getElementById('subingredient-title').textContent = icon + ' 请选择' + groupName + '种类';
+    const container = document.getElementById('subingredient-list');
+    container.innerHTML = '';
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'list-btn';
+      btn.textContent = icon + ' ' + item;
+      btn.onclick = () => showSoupsByIngredient(item);
+      container.appendChild(btn);
+    });
+    showPage('page-subingredient', groupName);
+  }
+
+  /* ============================================================
+     显示某食材对应的汤品列表
+  ============================================================ */
+  function showSoupsByIngredient(ingredient) {
+    const filtered = soups.filter(s => s.mainIngredient === ingredient);
+    document.getElementById('soup-list-title').textContent = '🍲 ' + ingredient + ' 相关汤品';
+    renderSoupList(filtered);
+    showPage('page-soup-list', ingredient + '汤品');
+  }
+
+  /* ============================================================
+     渲染分类列表（功能2）
+  ============================================================ */
+  function renderCategoryList() {
+    const categories = ["清淡养胃", "补气养血", "增强免疫", "滋补强身", "健脾开胃", "清热消暑"];
+    const icons = { "清淡养胃": "🌱", "补气养血": "❤️", "增强免疫": "💪", "滋补强身": "🌟", "健脾开胃": "🍽️", "清热消暑": "🌊" };
+    const container = document.getElementById('category-list');
+    container.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'category-btn';
+      btn.textContent = (icons[cat] || '📋') + ' ' + cat;
+      btn.onclick = () => showSoupsByCategory(cat);
+      container.appendChild(btn);
+    });
+  }
+
+  /* ============================================================
+     显示某类型的汤品列表
+  ============================================================ */
+  function showSoupsByCategory(category) {
+    const filtered = soups.filter(s => s.category.includes(category));
+    document.getElementById('soup-list-title').textContent = '📋 ' + category + ' 汤品';
+    renderSoupList(filtered);
+    showPage('page-soup-list', category);
+  }
+
+  /* ============================================================
+     渲染汤品列表（通用）
+  ============================================================ */
+  function renderSoupList(soupList) {
+    const container = document.getElementById('soup-list');
+    container.innerHTML = '';
+    if (soupList.length === 0) {
+      container.innerHTML = '<p style="font-size:20px;color:#888;text-align:center;padding:20px;">暂无相关汤品</p>';
+      return;
+    }
+    soupList.forEach(soup => {
+      const btn = document.createElement('button');
+      btn.className = 'list-btn';
+      btn.textContent = '🍲 ' + soup.name;
+      btn.onclick = () => showSoupDetail(soup.name);
+      container.appendChild(btn);
+    });
+  }
+
+  /* ============================================================
+     显示汤品详情（功能1/2/3通用）
+  ============================================================ */
+  function showSoupDetail(soupName) {
+    const soup = soups.find(s => s.name === soupName);
+    if (!soup) return;
+
+    document.getElementById('detail-soup-name').textContent = soup.name;
+
+    let html = '';
+
+    // 主材料
+    html += `<div class="detail-section">
+      <h3>🥩 主材料</h3>
+      <p>${soup.mainMaterial}</p>
+    </div>`;
+
+    // 配料
+    html += `<div class="detail-section">
+      <h3>🧂 配料</h3>
+      <ul>${soup.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+    </div>`;
+
+    // 做法
+    html += `<div class="detail-section">
+      <h3>👨‍🍳 做法</h3>
+      ${soup.steps.map((step, idx) => `
+        <div class="step-item">
+          <div class="step-num">${idx + 1}</div>
+          <div class="step-text">${step}</div>
+        </div>`).join('')}
+    </div>`;
+
+    // 功效
+    html += `<div class="detail-section">
+      <h3>✨ 功效</h3>
+      <div class="tag-list">${soup.benefits.map(b => `<span class="tag">${b}</span>`).join('')}</div>
+    </div>`;
+
+    // 适合人群
+    html += `<div class="detail-section">
+      <h3>👍 适合人群</h3>
+      <ul>${soup.suitableFor.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>`;
+
+    // 不适合人群
+    html += `<div class="detail-section">
+      <h3>⚠️ 不适合人群</h3>
+      <div class="tag-list">${soup.avoidFor.map(a => `<span class="tag avoid">${a}</span>`).join('')}</div>
+    </div>`;
+
+    // 可替代食材
+    if (soup.replacements && Object.keys(soup.replacements).length > 0) {
+      let replHtml = '';
+      for (const [key, vals] of Object.entries(soup.replacements)) {
+        replHtml += `<p style="font-size:19px;margin-bottom:8px;"><strong>${key}</strong> 可替代为：</p>
+        <div class="tag-list">${vals.map(v => `<span class="tag replace">${v}</span>`).join('')}</div>`;
+      }
+      html += `<div class="detail-section">
+        <h3>🔄 可替代食材</h3>
+        ${replHtml}
+      </div>`;
+    }
+
+    document.getElementById('detail-content').innerHTML = html;
+    showPage('page-soup-detail', soup.name);
+  }
+
+  /* ============================================================
+     渲染本周推荐（功能3）
+  ============================================================ */
+  function renderWeeklyMenu() {
+    const container = document.getElementById('weekly-list');
+    container.innerHTML = '';
+    weeklyMenu.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'week-card';
+      card.onclick = () => showSoupDetail(item.soupName);
+      card.innerHTML = `
+        <div class="week-day">${item.day}</div>
+        <div class="week-soup">🍲 ${item.soupName}</div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  /* ============================================================
+     重新随机生成本周菜单
+  ============================================================ */
+  function regenerateWeekly() {
+    const days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+    // 随机打乱所有汤品，取前7个（保证不重复）
+    const shuffled = [...soups].sort(() => Math.random() - 0.5);
+    const picked = shuffled.slice(0, 7);
+    weeklyMenu.length = 0;
+    picked.forEach((soup, i) => {
+      weeklyMenu.push({ day: days[i], soupName: soup.name });
+    });
+    renderWeeklyMenu();
+  }
+
+  /* ============================================================
+     渲染食材功效分类列表（功能4）——使用 ingredientCategoryGroups
+  ============================================================ */
+  function renderIngrList() {
+    const container = document.getElementById('ingr-list');
+    container.innerHTML = '';
+    ingredientCategoryGroups.forEach(g => {
+      const btn = document.createElement('button');
+      btn.className = 'category-btn';
+      btn.textContent = g.icon + ' ' + g.group + '  ›';
+      btn.onclick = () => showIngrByCategory(g.group, g.items, g.icon);
+      container.appendChild(btn);
+    });
+  }
+
+  /* ============================================================
+     显示某分类下的食材列表
+  ============================================================ */
+  function showIngrByCategory(groupName, items, icon) {
+    document.getElementById('ingr-sublist-title').textContent = icon + ' ' + groupName + ' — 请选择食材';
+    const container = document.getElementById('ingr-sublist');
+    container.innerHTML = '';
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'list-btn';
+      btn.textContent = icon + ' ' + item;
+      btn.onclick = () => showIngrDetail(item);
+      container.appendChild(btn);
+    });
+    showPage('page-ingr-sublist', groupName);
+  }
+
+  /* ============================================================
+     显示食材功效详情
+  ============================================================ */
+  function showIngrDetail(ingrName) {
+    const ingr = ingredientsInfo.find(i => i.name === ingrName);
+    if (!ingr) return;
+
+    document.getElementById('ingr-detail-name').textContent = '🌿 ' + ingr.name;
+
+    let html = '';
+
+    // 功效
+    html += `<div class="detail-section">
+      <h3>✨ 功效</h3>
+      <div class="tag-list">${ingr.benefits.map(b => `<span class="tag">${b}</span>`).join('')}</div>
+    </div>`;
+
+    // 适合人群
+    html += `<div class="detail-section">
+      <h3>👍 适合人群</h3>
+      <ul>${ingr.suitableFor.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>`;
+
+    // 不适合人群
+    html += `<div class="detail-section">
+      <h3>⚠️ 不适合人群</h3>
+      <div class="tag-list">${ingr.avoidFor.map(a => `<span class="tag avoid">${a}</span>`).join('')}</div>
+    </div>`;
+
+    // 推荐搭配
+    html += `<div class="detail-section">
+      <h3>🤝 推荐搭配</h3>
+      <div class="tag-list">${ingr.pairWith.map(p => `<span class="tag replace">${p}</span>`).join('')}</div>
+    </div>`;
+
+    document.getElementById('ingr-detail-content').innerHTML = html;
+    showPage('page-ingr-detail', ingr.name);
+  }
+
+  /* ============================================================
+     初始化：页面加载时预渲染各列表数据
+  ============================================================ */
+  (function init() {
+    renderIngredientList();
+    renderCategoryList();
+    renderWeeklyMenu();
+    renderIngrList();
+    // 首页历史初始化
+    pageHistory = ['page-home'];
+  })();
+
+</script>
+</body>
+</html>
